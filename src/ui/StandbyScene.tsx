@@ -38,8 +38,17 @@ export function StandbyScene({ state, active }: StandbySceneProps) {
       style={themeStyle}
     >
       <img className="standby-bg" src={theme.standbyBackground} alt="" />
+      {theme.standbyDecor ? (
+        <img className="standby-decor" src={theme.standbyDecor} alt="" aria-hidden="true" />
+      ) : null}
       <div className="standby-vignette" />
       <img className="theme-icon standby-theme-icon" src={theme.mark} alt="" />
+      <img
+        className="standby-ornament"
+        src={theme.accentOrnament ?? theme.mark}
+        alt=""
+        aria-hidden="true"
+      />
       <div className="standby-copy">
         {theme.standbyTitle ? (
           <img className="standby-title-art" src={theme.standbyTitle} alt="" />

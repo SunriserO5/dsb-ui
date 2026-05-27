@@ -1,13 +1,13 @@
 {
-  "theme": "caerulaarbor",
-  "scene": "standby",
-  "updatedAt": "2026-05-27T12:34:04.406Z",
+  "theme": "furnacesidefables",
+  "scene": "live",
+  "updatedAt": "2026-05-27T12:52:49.402Z",
   "match": {
     "eventTitle": "大啥杯 #2",
     "roundTitle": "",
     "caster": "01w",
     "supportTimer": {
-      "baseMs": 180000,
+      "baseMs": 179167,
       "startedAt": null,
       "running": false
     },

@@ -12,7 +12,7 @@ import {
   TimerReset,
   Waves,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { type CSSProperties, useEffect, useMemo, useState } from "react";
 import { useLiveState } from "../hooks/useLiveState";
 import { caerulaAssets, themeList } from "../theme/assets";
 import type { LiveState, Scene, SupportTimer, ThemeId } from "../types";
@@ -257,6 +257,7 @@ export function ControlPage() {
                 type="button"
                 key={theme.id}
                 className={state.theme === theme.id ? "theme-button active" : "theme-button"}
+                style={{ "--theme-preview": theme.accent } as CSSProperties}
                 onClick={() => setTheme(theme.id)}
               >
                 <span>{theme.shortName}</span>

@@ -37,6 +37,9 @@ export function LiveScene({ state, active }: LiveSceneProps) {
       style={themeStyle}
     >
       <img className="scene-bg scene-bg-soft" src={theme.liveBackground} alt="" />
+      {theme.liveDecor ? (
+        <img className="theme-live-decor" src={theme.liveDecor} alt="" aria-hidden="true" />
+      ) : null}
       <img className="theme-icon live-theme-icon" src={theme.mark} alt="" />
       <div className="screen-frame" aria-hidden="true">
         <div className="screen-corner top-left" />
@@ -50,6 +53,12 @@ export function LiveScene({ state, active }: LiveSceneProps) {
       </div>
 
       <aside className="player-sidebar">
+        {theme.panelTexture ? (
+          <img className="sidebar-texture" src={theme.panelTexture} alt="" aria-hidden="true" />
+        ) : null}
+        <div className="sidebar-emblem" aria-hidden="true">
+          <img src={theme.accentOrnament ?? theme.mark} alt="" />
+        </div>
         <div className="sidebar-title">当前选手</div>
         <div className="player-card">
           <div className="avatar-window">
@@ -88,6 +97,9 @@ export function LiveScene({ state, active }: LiveSceneProps) {
       </aside>
 
       <footer className="lower-third">
+        {theme.lowerTexture ? (
+          <img className="lower-texture" src={theme.lowerTexture} alt="" aria-hidden="true" />
+        ) : null}
         <div className="lower-block caster">
           <span>本场解说</span>
           <strong>{state.match.caster}</strong>
