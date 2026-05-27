@@ -432,33 +432,35 @@ textarea {
 .standby-signal {
   position: absolute;
   left: 50%;
-  bottom: 92px;
-  transform: translateX(-50%);
-  width: 820px;
+  top: 67%;
+  transform: translate(-50%, -50%);
+  width: min(860px, 72%);
   display: grid;
-  grid-template-columns: 18px 1fr;
-  gap: 14px;
-  align-items: center;
-  padding: 14px 20px;
-  background: rgba(2, 10, 14, 0.78);
-  border: 1px solid rgba(66, 241, 242, 0.46);
+  justify-items: center;
+  gap: 10px;
+  padding: 0 20px;
+  background: transparent;
+  border: 0;
   color: #eaffff;
-  font-size: 22px;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.standby-signal i {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--cyan);
-  box-shadow: 0 0 18px var(--cyan);
+  font-size: 24px;
+  line-height: 1.25;
+  text-align: center;
+  text-shadow:
+    0 2px 14px rgba(0, 0, 0, 0.9),
+    0 0 18px rgba(66, 241, 242, 0.28);
 }
 
 .standby-signal span {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.standby-signal strong {
+  color: var(--cyan);
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 @keyframes standbyPulse {

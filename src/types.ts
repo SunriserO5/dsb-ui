@@ -20,6 +20,7 @@ export type LiveState = {
     roundTitle: string;
     caster: string;
     supportTimer: SupportTimer;
+    standbyTimer: SupportTimer;
     standbyPrompt: string;
   };
   player: {

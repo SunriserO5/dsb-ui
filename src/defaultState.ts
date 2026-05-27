@@ -13,6 +13,11 @@ export const defaultState: LiveState = {
       startedAt: null,
       running: false,
     },
+    standbyTimer: {
+      baseMs: 0,
+      startedAt: null,
+      running: false,
+    },
     standbyPrompt: "请选手准备，导播确认画面后开始。",
   },
   player: {

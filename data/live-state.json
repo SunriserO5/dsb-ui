@@ -1,25 +1,30 @@
 {
   "theme": "caerulaarbor",
-  "scene": "live",
-  "updatedAt": "2026-05-27T05:35:42.283Z",
+  "scene": "standby",
+  "updatedAt": "2026-05-27T08:37:06.317Z",
   "match": {
-    "eventTitle": "水月与深蓝之树",
-    "roundTitle": "赛事表演赛",
-    "caster": "本场解说",
+    "eventTitle": "大啥杯 #2",
+    "roundTitle": "水月与深蓝之树",
+    "caster": "01w",
     "supportTimer": {
       "baseMs": 170109,
       "startedAt": null,
       "running": false
     },
-    "standbyPrompt": "请选手准备，导播确认画面后开始。"
+    "standbyTimer": {
+      "baseMs": 0,
+      "startedAt": null,
+      "running": false
+    },
+    "standbyPrompt": ""
   },
   "player": {
-    "name": "test",
-    "team": "所属队伍",
+    "name": "原神启动",
+    "team": "米哈游",
     "avatarLabel": "MIZUKI"
   },
   "team": {
-    "name": "所属队伍",
+    "name": "米哈游",
     "members": [
       {
         "label": "开局干员",

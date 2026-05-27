@@ -21,6 +21,11 @@ const defaultState = {
       startedAt: null,
       running: false,
     },
+    standbyTimer: {
+      baseMs: 0,
+      startedAt: null,
+      running: false,
+    },
     standbyPrompt: "请选手准备，导播确认画面后开始。",
   },
   player: {
@@ -71,14 +76,17 @@ function broadcast(payload) {
 
 function normalizePatch(nextState) {
   const nextMatch = { ...defaultState.match, ...nextState.match };
-  if (!nextMatch.supportTimer) {
-    nextMatch.supportTimer = defaultState.match.supportTimer;
-  } else if (typeof nextMatch.supportTimer.baseMs !== "number") {
-    nextMatch.supportTimer = {
-      baseMs: Math.max(0, Number(nextMatch.supportTimer.baseSeconds || 0) * 1000),
-      startedAt: nextMatch.supportTimer.startedAt ?? null,
-      running: Boolean(nextMatch.supportTimer.running),
-    };
+
+  for (const timerKey of ["supportTimer", "standbyTimer"]) {
+    if (!nextMatch[timerKey]) {
+      nextMatch[timerKey] = defaultState.match[timerKey];
+    } else if (typeof nextMatch[timerKey].baseMs !== "number") {
+      nextMatch[timerKey] = {
+        baseMs: Math.max(0, Number(nextMatch[timerKey].baseSeconds || 0) * 1000),
+        startedAt: nextMatch[timerKey].startedAt ?? null,
+        running: Boolean(nextMatch[timerKey].running),
+      };
+    }
   }
 
   return {

@@ -13,8 +13,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLiveState } from "../hooks/useLiveState";
-import type { LiveState, Scene } from "../types";
+import type { LiveState, Scene, SupportTimer } from "../types";
 import { formatTimer, getTimerMs, parseTimerText } from "../utils/timer";
+
+type TimerKey = "supportTimer" | "standbyTimer";
 
 function setAt<T>(items: T[], index: number, value: T) {
   return items.map((item, itemIndex) => (itemIndex === index ? value : item));
@@ -23,31 +25,53 @@ function setAt<T>(items: T[], index: number, value: T) {
 export function ControlPage() {
   const { state, status, updateState } = useLiveState();
   const isConnected = status === "connected";
-  const [timerInput, setTimerInput] = useState("00:00:00");
+  const [supportTimerInput, setSupportTimerInput] = useState("00:00:00");
+  const [standbyTimerInput, setStandbyTimerInput] = useState("00:00:00");
   const [now, setNow] = useState(Date.now());
 
-  const timerText = useMemo(
+  const supportTimerText = useMemo(
     () => formatTimer(getTimerMs(state.match.supportTimer, now)),
     [state.match.supportTimer, now],
   );
+  const standbyTimerText = useMemo(
+    () => formatTimer(getTimerMs(state.match.standbyTimer, now)),
+    [state.match.standbyTimer, now],
+  );
 
   useEffect(() => {
-    if (state.match.supportTimer.running) {
+    if (state.match.supportTimer.running || state.match.standbyTimer.running) {
       const interval = window.setInterval(() => setNow(Date.now()), 33);
       return () => window.clearInterval(interval);
     }
-  }, [state.match.supportTimer.running, state.match.supportTimer.startedAt]);
+  }, [
+    state.match.supportTimer.running,
+    state.match.supportTimer.startedAt,
+    state.match.standbyTimer.running,
+    state.match.standbyTimer.startedAt,
+  ]);
 
   useEffect(() => {
     if (state.match.supportTimer.running) {
       return;
     }
 
-    setTimerInput(timerText);
+    setSupportTimerInput(supportTimerText);
   }, [
-    state.match.supportTimer.baseMs,
     state.match.supportTimer.running,
-    timerText,
+    state.match.supportTimer.baseMs,
+    supportTimerText,
+  ]);
+
+  useEffect(() => {
+    if (state.match.standbyTimer.running) {
+      return;
+    }
+
+    setStandbyTimerInput(standbyTimerText);
+  }, [
+    state.match.standbyTimer.running,
+    state.match.standbyTimer.baseMs,
+    standbyTimerText,
   ]);
 
   function patch(patchState: Partial<LiveState>) {
@@ -64,71 +88,118 @@ export function ControlPage() {
     patch({ scene });
   }
 
-  function setTimerFromInput() {
-    const ms = parseTimerText(timerInput);
+  function updateTimer(timerKey: TimerKey, timer: SupportTimer) {
+    patch({
+      match: {
+        ...state.match,
+        [timerKey]: timer,
+      },
+    });
+  }
+
+  function setTimerFromInput(
+    timerKey: TimerKey,
+    input: string,
+    fallbackText: string,
+    setInput: (value: string) => void,
+  ) {
+    const ms = parseTimerText(input);
     if (ms === null) {
-      setTimerInput(timerText);
+      setInput(fallbackText);
       return;
     }
 
-    patch({
-      match: {
-        ...state.match,
-        supportTimer: {
-          baseMs: ms,
-          startedAt: null,
-          running: false,
-        },
-      },
+    updateTimer(timerKey, {
+      baseMs: ms,
+      startedAt: null,
+      running: false,
     });
   }
 
-  function startTimer() {
-    const inputMs = parseTimerText(timerInput);
-    const baseMs = state.match.supportTimer.running
-      ? getTimerMs(state.match.supportTimer)
-      : inputMs ?? getTimerMs(state.match.supportTimer);
+  function startTimer(
+    timerKey: TimerKey,
+    input: string,
+    fallbackText: string,
+    setInput: (value: string) => void,
+  ) {
+    const timer = state.match[timerKey];
+    const inputMs = parseTimerText(input);
+    const baseMs = timer.running
+      ? getTimerMs(timer)
+      : inputMs ?? getTimerMs(timer);
     if (baseMs <= 0) {
-      setTimerInput(timerText);
+      setInput(fallbackText);
       return;
     }
 
-    patch({
-      match: {
-        ...state.match,
-        supportTimer: {
-          baseMs,
-          startedAt: new Date().toISOString(),
-          running: true,
-        },
-      },
+    updateTimer(timerKey, {
+      baseMs,
+      startedAt: new Date().toISOString(),
+      running: true,
     });
   }
 
-  function pauseTimer() {
-    patch({
-      match: {
-        ...state.match,
-        supportTimer: {
-          baseMs: getTimerMs(state.match.supportTimer),
-          startedAt: null,
-          running: false,
-        },
-      },
+  function pauseTimer(timerKey: TimerKey) {
+    updateTimer(timerKey, {
+      baseMs: getTimerMs(state.match[timerKey]),
+      startedAt: null,
+      running: false,
     });
   }
 
-  function resetTimer() {
-    patch({
-      match: {
-        ...state.match,
-        supportTimer: {
-          baseMs: 0,
-          startedAt: null,
-          running: false,
-        },
-      },
+  function resetTimer(timerKey: TimerKey) {
+    updateTimer(timerKey, {
+      baseMs: 0,
+      startedAt: null,
+      running: false,
     });
+  }
+
+  function renderTimerEditor(
+    timerKey: TimerKey,
+    input: string,
+    text: string,
+    setInput: (value: string) => void,
+  ) {
+    const timer = state.match[timerKey];
+
+    return (
+      <div className="timer-editor">
+        <input
+          value={timer.running ? text : input}
+          onChange={(event) => setInput(event.target.value)}
+          onBlur={() => setTimerFromInput(timerKey, input, text, setInput)}
+          disabled={timer.running}
+          inputMode="numeric"
+          placeholder="00:00:00"
+        />
+        <button
+          type="button"
+          onClick={() => setTimerFromInput(timerKey, input, text, setInput)}
+        >
+          <TimerReset size={16} />
+          <span>设置</span>
+        </button>
+        {timer.running ? (
+          <button type="button" onClick={() => pauseTimer(timerKey)}>
+            <Pause size={16} />
+            <span>暂停</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => startTimer(timerKey, input, text, setInput)}
+          >
+            <Play size={16} />
+            <span>开始</span>
+          </button>
+        )}
+        <button type="button" onClick={() => resetTimer(timerKey)}>
+          <RotateCcw size={16} />
+          <span>清零</span>
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -199,35 +270,12 @@ export function ControlPage() {
             </label>
             <label>
               <span>支援倒计时</span>
-              <div className="timer-editor">
-                <input
-                  value={state.match.supportTimer.running ? timerText : timerInput}
-                  onChange={(event) => setTimerInput(event.target.value)}
-                  onBlur={setTimerFromInput}
-                  disabled={state.match.supportTimer.running}
-                  inputMode="numeric"
-                  placeholder="00:00:00"
-                />
-                <button type="button" onClick={setTimerFromInput}>
-                  <TimerReset size={16} />
-                  <span>设置</span>
-                </button>
-                {state.match.supportTimer.running ? (
-                  <button type="button" onClick={pauseTimer}>
-                    <Pause size={16} />
-                    <span>暂停</span>
-                  </button>
-                ) : (
-                  <button type="button" onClick={startTimer}>
-                    <Play size={16} />
-                    <span>开始</span>
-                  </button>
-                )}
-                <button type="button" onClick={resetTimer}>
-                  <RotateCcw size={16} />
-                  <span>清零</span>
-                </button>
-              </div>
+              {renderTimerEditor(
+                "supportTimer",
+                supportTimerInput,
+                supportTimerText,
+                setSupportTimerInput,
+              )}
             </label>
           </section>
 
@@ -277,6 +325,15 @@ export function ControlPage() {
                   patch({ match: { ...state.match, standbyPrompt: event.target.value } })
                 }
               />
+            </label>
+            <label>
+              <span>待机倒计时</span>
+              {renderTimerEditor(
+                "standbyTimer",
+                standbyTimerInput,
+                standbyTimerText,
+                setStandbyTimerInput,
+              )}
             </label>
           </section>
 
@@ -330,6 +387,10 @@ export function ControlPage() {
               <div>
                 <dt>当前场景</dt>
                 <dd>{state.scene === "live" ? "比赛画面" : "待机画面"}</dd>
+              </div>
+              <div>
+                <dt>待机倒计时</dt>
+                <dd>{standbyTimerText}</dd>
               </div>
               <div>
                 <dt>最后同步</dt>
