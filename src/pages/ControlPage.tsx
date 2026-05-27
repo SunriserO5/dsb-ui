@@ -2,6 +2,7 @@ import {
   Circle,
   Clock3,
   ListPlus,
+  Palette,
   Pause,
   Play,
   Radio,
@@ -13,7 +14,10 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useLiveState } from "../hooks/useLiveState";
-import type { LiveState, Scene, SupportTimer } from "../types";
+import { caerulaAssets, themeList } from "../theme/assets";
+import type { LiveState, Scene, SupportTimer, ThemeId } from "../types";
+import { ImagePicker } from "../ui/ImagePicker";
+import { ImageUploader } from "../ui/ImageUploader";
 import { formatTimer, getTimerMs, parseTimerText } from "../utils/timer";
 
 type TimerKey = "supportTimer" | "standbyTimer";
@@ -86,6 +90,10 @@ export function ControlPage() {
 
   function setScene(scene: Scene) {
     patch({ scene });
+  }
+
+  function setTheme(theme: ThemeId) {
+    patch({ theme });
   }
 
   function updateTimer(timerKey: TimerKey, timer: SupportTimer) {
@@ -206,9 +214,12 @@ export function ControlPage() {
     <main className="control-page">
       <section className="control-shell">
         <header className="control-header">
-          <div>
+          <div className="control-title">
+            <img src={caerulaAssets.icon} alt="" />
+            <div>
             <p className="control-kicker">Caerula Arbor</p>
             <h1>导播控制台</h1>
+            </div>
           </div>
           <div className={`connection-pill ${status}`}>
             <Circle size={14} fill="currentColor" />
@@ -233,6 +244,26 @@ export function ControlPage() {
             <Waves size={22} />
             <span>待机画面</span>
           </button>
+        </section>
+
+        <section className="control-panel theme-panel" aria-label="主题切换">
+          <div className="panel-title">
+            <Palette size={18} />
+            <h2>直播主题</h2>
+          </div>
+          <div className="theme-switcher">
+            {themeList.map((theme) => (
+              <button
+                type="button"
+                key={theme.id}
+                className={state.theme === theme.id ? "theme-button active" : "theme-button"}
+                onClick={() => setTheme(theme.id)}
+              >
+                <span>{theme.shortName}</span>
+                <strong>{theme.name}</strong>
+              </button>
+            ))}
+          </div>
         </section>
 
         <div className="control-grid">
@@ -317,6 +348,13 @@ export function ControlPage() {
                 }
               />
             </label>
+            <ImageUploader
+              label="选手头像"
+              value={state.player.avatarUrl}
+              onChange={(avatarUrl) =>
+                patch({ player: { ...state.player, avatarUrl } })
+              }
+            />
             <label>
               <span>待机提示</span>
               <textarea
@@ -341,6 +379,22 @@ export function ControlPage() {
             <div className="panel-title">
               <ListPlus size={18} />
               <h2>右侧信息栏</h2>
+            </div>
+            <div className="avatar-editor-grid">
+              <ImageUploader
+                label="战队头像"
+                value={state.team.avatarUrl}
+                onChange={(avatarUrl) =>
+                  patch({ team: { ...state.team, avatarUrl } })
+                }
+              />
+              <ImagePicker
+                label="开局干员头像"
+                value={state.team.openingOperatorAvatarUrl}
+                onChange={(openingOperatorAvatarUrl) =>
+                  patch({ team: { ...state.team, openingOperatorAvatarUrl } })
+                }
+              />
             </div>
             {state.team.members.map((member, index) => (
               <div className="member-row" key={`${member.label}-${index}`}>

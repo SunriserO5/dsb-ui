@@ -24,9 +24,12 @@ export const defaultState: LiveState = {
     name: "当前选手",
     team: "所属队伍",
     avatarLabel: "MIZUKI",
+    avatarUrl: "",
   },
   team: {
     name: "所属队伍",
+    avatarUrl: "",
+    openingOperatorAvatarUrl: "",
     members: [
       { label: "开局干员", value: "待确认" },
       { label: "开局分队", value: "待确认" },

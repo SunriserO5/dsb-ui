@@ -1,12 +1,42 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { BroadcastCanvas } from "../ui/BroadcastCanvas";
 import { LiveScene } from "../ui/LiveScene";
 import { StandbyScene } from "../ui/StandbyScene";
 import { useLiveState } from "../hooks/useLiveState";
+import type { LiveState } from "../types";
 import { getTimerMs } from "../utils/timer";
 
 export function LivePage() {
   const { state, updateState } = useLiveState();
+  const previousStateRef = useRef<LiveState>(state);
+  const clearGhostRef = useRef<number | null>(null);
+  const [ghostState, setGhostState] = useState<LiveState | null>(null);
+
+  useEffect(() => {
+    const previousState = previousStateRef.current;
+    if (previousState.theme !== state.theme) {
+      setGhostState(previousState);
+
+      if (clearGhostRef.current) {
+        window.clearTimeout(clearGhostRef.current);
+      }
+
+      clearGhostRef.current = window.setTimeout(() => {
+        setGhostState(null);
+        clearGhostRef.current = null;
+      }, 380);
+    }
+
+    previousStateRef.current = state;
+  }, [state]);
+
+  useEffect(() => {
+    return () => {
+      if (clearGhostRef.current) {
+        window.clearTimeout(clearGhostRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (state.scene !== "standby" || !state.match.standbyTimer.running) {
@@ -41,6 +71,12 @@ export function LivePage() {
       <BroadcastCanvas>
         <LiveScene state={state} active={state.scene === "live"} />
         <StandbyScene state={state} active={state.scene === "standby"} />
+        {ghostState ? (
+          <div className="theme-transition-ghost" aria-hidden="true">
+            <LiveScene state={ghostState} active={ghostState.scene === "live"} />
+            <StandbyScene state={ghostState} active={ghostState.scene === "standby"} />
+          </div>
+        ) : null}
       </BroadcastCanvas>
     </main>
   );

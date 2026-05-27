@@ -1,5 +1,12 @@
 export type Scene = "live" | "standby";
 
+export type ThemeId =
+  | "caerulaarbor"
+  | "crimsonsolitaire"
+  | "furnacesidefables"
+  | "gardenofgrotesqueries"
+  | "samiexpedition";
+
 export type TeamMember = {
   label: string;
   value: string;
@@ -12,7 +19,7 @@ export type SupportTimer = {
 };
 
 export type LiveState = {
-  theme: "caerulaarbor";
+  theme: ThemeId;
   scene: Scene;
   updatedAt: string;
   match: {
@@ -27,9 +34,12 @@ export type LiveState = {
     name: string;
     team: string;
     avatarLabel: string;
+    avatarUrl: string;
   };
   team: {
     name: string;
+    avatarUrl: string;
+    openingOperatorAvatarUrl: string;
     members: TeamMember[];
   };
 };

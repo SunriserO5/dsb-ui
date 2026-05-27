@@ -7,6 +7,13 @@ import { WebSocketServer } from "ws";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const statePath = resolve(__dirname, "../data/live-state.json");
 const port = Number(process.env.STATE_SERVER_PORT || 8787);
+const themeIds = new Set([
+  "caerulaarbor",
+  "crimsonsolitaire",
+  "furnacesidefables",
+  "gardenofgrotesqueries",
+  "samiexpedition",
+]);
 
 const defaultState = {
   theme: "caerulaarbor",
@@ -32,9 +39,12 @@ const defaultState = {
     name: "当前选手",
     team: "所属队伍",
     avatarLabel: "MIZUKI",
+    avatarUrl: "",
   },
   team: {
     name: "所属队伍",
+    avatarUrl: "",
+    openingOperatorAvatarUrl: "",
     members: [
       { label: "开局干员", value: "待确认" },
       { label: "开局分队", value: "待确认" },
@@ -48,7 +58,7 @@ let saveTimer;
 async function loadState() {
   try {
     const file = await readFile(statePath, "utf8");
-    state = { ...defaultState, ...JSON.parse(file) };
+    state = normalizePatch(JSON.parse(file));
   } catch (error) {
     console.warn("[state] using default state:", error.message);
   }
@@ -76,6 +86,9 @@ function broadcast(payload) {
 
 function normalizePatch(nextState) {
   const nextMatch = { ...defaultState.match, ...nextState.match };
+  const theme = themeIds.has(nextState.theme)
+    ? nextState.theme
+    : defaultState.theme;
 
   for (const timerKey of ["supportTimer", "standbyTimer"]) {
     if (!nextMatch[timerKey]) {
@@ -92,6 +105,7 @@ function normalizePatch(nextState) {
   return {
     ...defaultState,
     ...nextState,
+    theme,
     match: nextMatch,
     player: { ...defaultState.player, ...nextState.player },
     team: {
