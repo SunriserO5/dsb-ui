@@ -2,9 +2,18 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { defaultState } from "../defaultState";
 import type { ConnectionStatus, LiveState } from "../types";
 
-const WS_URL =
-  import.meta.env.VITE_WS_URL ??
-  `ws://${window.location.hostname || "localhost"}:8787`;
+function getDefaultWsUrl() {
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const hostname = window.location.hostname || "localhost";
+
+  if (window.location.port === "5173") {
+    return `${protocol}//${hostname}:8787`;
+  }
+
+  return `${protocol}//${window.location.host}`;
+}
+
+const WS_URL = import.meta.env.VITE_WS_URL ?? getDefaultWsUrl();
 
 export function useLiveState() {
   const [state, setState] = useState<LiveState>(defaultState);

@@ -217,8 +217,8 @@ export function ControlPage() {
           <div className="control-title">
             <img src={caerulaAssets.icon} alt="" />
             <div>
-            <p className="control-kicker">Caerula Arbor</p>
-            <h1>导播控制台</h1>
+              <p className="control-kicker">大啥杯直播UI</p>
+              <h1>导播控制台</h1>
             </div>
           </div>
           <div className={`connection-pill ${status}`}>

@@ -8,20 +8,31 @@
     "dev:client": "vite --host 0.0.0.0",
     "dev:server": "node server/state-server.js",
     "build": "tsc && vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "start": "node server/package-server.cjs",
+    "package:win": "node scripts/clean-package.mjs && npm run build && pkg server/package-server.cjs --targets node22-win-x64 --output release/大啥杯直播UI.exe",
+    "package:zip": "npm run package:win && node scripts/package-zip.mjs"
+  },
+  "pkg": {
+    "assets": [
+      "dist/**/*"
+    ]
   },
   "dependencies": {
-    "@vitejs/plugin-react": "^5.0.0",
-    "concurrently": "^9.2.0",
-    "vite": "^7.0.0",
-    "typescript": "^5.8.0",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
+    "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
-    "@types/node": "^22.15.0",
     "@types/ws": "^8.5.12",
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.0",
     "lucide-react": "^0.468.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.0",
+    "vite": "^7.0.0",
     "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@yao-pkg/pkg": "^6.14.2"
   }
 }
