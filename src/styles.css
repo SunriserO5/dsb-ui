@@ -110,6 +110,25 @@ textarea {
   --theme-display-font: "Noto Sans SC", "Microsoft YaHei UI", "PingFang SC", sans-serif;
 }
 
+.live-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  clip-path: polygon(
+    evenodd,
+    0 0,
+    100% 0,
+    100% 100%,
+    0 100%,
+    0 0,
+    40px 38px,
+    40px 928px,
+    1626px 928px,
+    1626px 38px,
+    40px 38px
+  );
+}
+
 .scene-bg {
   position: absolute;
   inset: 0;
@@ -171,6 +190,19 @@ textarea {
   position: absolute;
   inset: 0;
   pointer-events: none;
+  clip-path: polygon(
+    evenodd,
+    0 0,
+    100% 0,
+    100% 100%,
+    0 100%,
+    0 0,
+    40px 38px,
+    40px 928px,
+    1626px 928px,
+    1626px 38px,
+    40px 38px
+  );
 }
 
 .live-scene::before {

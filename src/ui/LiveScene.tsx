@@ -36,11 +36,13 @@ export function LiveScene({ state, active }: LiveSceneProps) {
       className={`scene-layer live-scene themed-scene ${theme.className} ${active ? "active" : ""}`}
       style={themeStyle}
     >
-      <img className="scene-bg scene-bg-soft" src={theme.liveBackground} alt="" />
-      {theme.liveDecor ? (
-        <img className="theme-live-decor" src={theme.liveDecor} alt="" aria-hidden="true" />
-      ) : null}
-      <img className="theme-icon live-theme-icon" src={theme.mark} alt="" />
+      <div className="live-backdrop" aria-hidden="true">
+        <img className="scene-bg scene-bg-soft" src={theme.liveBackground} alt="" />
+        {theme.liveDecor ? (
+          <img className="theme-live-decor" src={theme.liveDecor} alt="" />
+        ) : null}
+        <img className="theme-icon live-theme-icon" src={theme.mark} alt="" />
+      </div>
       <div className="screen-frame" aria-hidden="true">
         <div className="screen-corner top-left" />
         <div className="screen-corner top-right" />
